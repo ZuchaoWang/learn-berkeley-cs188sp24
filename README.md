@@ -19,3 +19,9 @@ This class is not really used in tutorial and search projects. Maybe it is part 
 This is a standard priority queue implementation using a heap. It allows the same item to be added multiple times with different priorities. In such case, the item with the lowest priority value will stay in the queue.
 
 In its `update` method, it uses the `for-else` construct to check if an item can be found in the queue. The `else` block is executed only if the `for` loop completes without hitting a `break` statement, which means the item was not found in the queue. If we change `break` to `return`, and remove the `else` block, the logic will still be correct, and even more readable.
+
+#### PriorityQueueWithFunction class
+
+This is the PriorityQueue that takes a priority function as an argument. In this way, it has the same interface as Stack and Queue classes, which allows it to be used interchangeably with them in search.
+
+However, it inherits the `update` method from PriorityQueue, which does not use the priority function. This is a minor inconsistency, but hopefully this function won't be called in practice, since it is not part of the Stack/Queue interface.
