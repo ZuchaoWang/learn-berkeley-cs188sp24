@@ -105,3 +105,7 @@ The `GameStateData` class is defined in `game.py` file. It contains the followin
 #### `SearchAgent` class
 
 This is the pacman agent in question 1 defined in `search.py`. Its `registerInitialState` method determines all actions before any action is taken. It uses the search algorithms implemented in `search.py` file to find a path to the goal, and store the actions in `self.actions` list. Then its `getAction` method simply returns the next action from `self.actions` list. The current action is tracked by `self.actionIndex` attribute.
+
+#### `PositionSearchProblem` class
+
+This is the input to the search algorithms used by `SearchAgent`. It assumes there is only one agent (one pacman, no ghost), and one single food to reach.
