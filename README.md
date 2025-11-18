@@ -57,3 +57,51 @@ This class wraps a function and enforces a time limit on its execution. If the f
 If the system does not support the `SIGALRM` signal (e.g., Windows), the function will run to the end without interruption. After it finishes, if it took longer than the timeout, the exception will be raised. This means that on unsupported systems, the timeout is not enforced strictly.
 
 If the system supports `SIGALRM`, the timeout is enforced strictly using alarms, which can interrupt the function. However, nested timeouts are not supported, because setting a new alarm will overwrite the previous one. Therefore, if a function wrapped with `TimeoutFunction` calls another function also wrapped with `TimeoutFunction`, the inner timeout will overwrite the outer timeout, leading to unexpected behavior. The recommended usage pattern is to create a new `TimeoutFunction` wrapper for each function call (with no nested `TimeoutFunction`), then immediately call it once and discard it after it finishes.
+
+### Proj1: search
+
+#### Game intialization
+
+The entrypoint of the game is in `pacman.py` file, specifically the `runGames` function. It is called by the command line interface in the same file. This function initializes the `Game` class and call its `run` method.
+
+The `Game` class is defined in `game.py` file. Its `run` method first call `agent.registerInitialState` method for all agents to let them initialize their internal states. Then it enters the main game loop, where it first calls `observationFunction` to get the current game state, then calls each agent's `agent.getAction` method to get their actions, then applies the actions to the game state using `state.generateSuccessor` method. This loop continues until the game is over (win or lose).
+
+#### Game state
+
+The game state is represented by the `GameState` class defined in `pacman.py` file. This class contains all the information about the current state of the game, including the following:
+
+- `explored` class attribute: all the game state instances in the history
+- `data` instance attribute: the underlying `GameStateData` data structure that holds the real game state information
+
+The `GameStateData` class is defined in `game.py` file. It contains the following important attributes:
+
+- `layout`: the `Layout` object that represents the maze layout
+- `food`: a `Grid` object representing food positions in the maze (list of list of booleans)
+- `capsules`: a list of remaining capsule (power pellets) positions (x,y)
+- `agentStates`: a list of `AgentState` objects representing the state of each agent (position, direction, etc.)
+- `score`: the current game score
+- `_eaten`: whether each agent is eaten in the current transition, represented as a boolean list for all agents
+- `_foodEaten`: position (x,y) of food eaten in the current transition, or None if no food eaten in the current transition
+- `_foodAdded`: Not used
+- `_capsuleEaten`: position (x,y) of capsule eaten in the current transition, or None if no capsule eaten in the current transition
+- `_agentMoved`: which agent moved in the current transition
+- `_lose`: boolean flag indicating if the game is lost
+- `_win`: boolean flag indicating if the game is won
+- `scoreChange`: the change in score during the current transition
+
+**When a ghost is eaten (Pacman eats a scared ghost):**
+
+- The ghost immediately revives at its starting position in the same time step (via `GhostRules.placeGhost`)
+- The ghost's `scaredTimer` is reset to 0 (no longer scared)
+- Pacman gains +200 points
+- The `state.data._eaten[agentIndex]` flag is set to `True` for that ghost
+
+**When Pacman is eaten (touched by a non-scared ghost):**
+
+- Pacman does NOT revive - the game ends immediately
+- The `state.data._lose` flag is set to `True`
+- The score decreases by 500 points
+
+#### `SearchAgent` class
+
+This is the pacman agent in question 1 defined in `search.py`. Its `registerInitialState` method determines all actions before any action is taken. It uses the search algorithms implemented in `search.py` file to find a path to the goal, and store the actions in `self.actions` list. Then its `getAction` method simply returns the next action from `self.actions` list. The current action is tracked by `self.actionIndex` attribute.
