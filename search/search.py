@@ -89,8 +89,31 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    fringe = util.Stack()
+    visited_states = set()
+
+    # (state, actions, cost, parent_record)
+    # all records forms a linked list back to the start state
+    # the initial record has no parent, and is not pushed onto the fringe
+    cur_record = (problem.getStartState(), Directions.STOP, 0, None)  
+
+    # dfs main loop
+    while not problem.isGoalState(cur_record[0]):
+        visited_states.add(cur_record[0])
+        for cand_state, action, cost in problem.getSuccessors(cur_record[0]):
+            if cand_state not in visited_states:
+                fringe.push((cand_state, action, cost, cur_record))
+        if fringe.isEmpty():
+            assert False, "No path found"
+        cur_record = fringe.pop()
+    
+    # traverse linked list to get all actions
+    all_actions = []
+    while cur_record[3] is not None:
+        all_actions.append(cur_record[1])
+        cur_record = cur_record[3]
+    all_actions.reverse()
+    return all_actions
 
 def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
     """Search the shallowest nodes in the search tree first."""
