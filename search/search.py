@@ -90,35 +90,14 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     fringe = util.Stack()
-    visited_states = set()
-
-    # (state, actions, cost, parent_record)
-    # all records forms a linked list back to the start state
-    # the initial record has no parent, and is not pushed onto the fringe
-    cur_record = (problem.getStartState(), Directions.STOP, 0, None)  
-
-    # dfs main loop
-    while not problem.isGoalState(cur_record[0]):
-        visited_states.add(cur_record[0])
-        for cand_state, action, cost in problem.getSuccessors(cur_record[0]):
-            if cand_state not in visited_states:
-                fringe.push((cand_state, action, cost, cur_record))
-        if fringe.isEmpty():
-            assert False, "No path found"
-        cur_record = fringe.pop()
-    
-    # traverse linked list to get all actions
-    all_actions = []
-    while cur_record[3] is not None:
-        all_actions.append(cur_record[1])
-        cur_record = cur_record[3]
-    all_actions.reverse()
+    all_actions = _generalSearch(problem, fringe)
     return all_actions
 
 def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    fringe = util.Queue()
+    all_actions = _generalSearch(problem, fringe)
+    return all_actions
 
 def uniformCostSearch(problem: SearchProblem) -> List[Directions]:
     """Search the node of least total cost first."""
@@ -136,6 +115,36 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directi
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
+
+def _generalSearch(problem: SearchProblem, fringe) -> List[Directions]:
+    """A general search algorithm that can be used for various search strategies."""
+    visited_states = set()
+
+    # (state, actions, cost, parent_record)
+    # all records forms a linked list back to the start state
+    # the initial record has no parent, and is not pushed onto the fringe
+    cur_record = (problem.getStartState(), Directions.STOP, 0, None) 
+
+    # main loop
+    while not problem.isGoalState(cur_record[0]):
+        # expand current node
+        if cur_record[0] not in visited_states:
+            visited_states.add(cur_record[0]) 
+            for cand_state, action, cost in problem.getSuccessors(cur_record[0]):
+                cand_record = (cand_state, action, cost, cur_record)
+                fringe.push(cand_record)
+        # get next node
+        if fringe.isEmpty():
+            assert False, "No path found"
+        cur_record = fringe.pop()
+    
+    # traverse linked list to get all actions
+    all_actions = []
+    while cur_record[3] is not None:
+        all_actions.append(cur_record[1])
+        cur_record = cur_record[3]
+    all_actions.reverse()
+    return all_actions
 
 # Abbreviations
 bfs = breadthFirstSearch
