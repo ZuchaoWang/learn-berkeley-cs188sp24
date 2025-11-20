@@ -366,9 +366,31 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
+    currentPosition, visitedCorners = state
 
-    "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    # calculate remaining corners
+    remainingCorners = []
+    for i in range(len(corners)):
+        if not visitedCorners[i]:
+            remainingCorners.append(corners[i])
+
+    if not remainingCorners:
+        return 0
+
+    # generate all permutations of remaining corners
+    # find the minimum path cost among all permutations
+    from itertools import permutations
+    minPathCost = 999999
+    for perm in permutations(remainingCorners):
+        # compute path cost for this permutation
+        pathCost = 0
+        currentPos = currentPosition
+        for corner in perm:
+            # compute manhattan distance
+            pathCost += abs(currentPos[0] - corner[0]) + abs(currentPos[1] - corner[1])
+            currentPos = corner
+        minPathCost = min(minPathCost, pathCost)
+    return minPathCost
 
 
 
