@@ -2,6 +2,8 @@
 
 This is my solutions to the projects for the Berkeley CS 188 course for Spring 2024.
 
+Course website: <https://inst.eecs.berkeley.edu/~cs188/sp24/>
+
 ## Code Reading Notes
 
 ### Shared utility file `util.py`

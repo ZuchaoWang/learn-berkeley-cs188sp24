@@ -114,12 +114,13 @@ def nullHeuristic(state, problem=None) -> float:
 
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directions]:
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    fringe = util.PriorityQueueWithFunction(lambda record: record[2]+heuristic(record[0],problem))  # priority by agg cost
+    all_actions = _generalSearch(problem, fringe)
+    return all_actions
 
 def _generalSearch(problem: SearchProblem, fringe) -> List[Directions]:
     """A general search algorithm that can be used for various search strategies."""
-    visited_states = set()
+    visited = {} # map state (x,y) to cost
 
     # (state, actions, cost, parent_record)
     # all records forms a linked list back to the start state
@@ -128,9 +129,10 @@ def _generalSearch(problem: SearchProblem, fringe) -> List[Directions]:
 
     # main loop
     while not problem.isGoalState(cur_record[0]):
-        # expand current node
-        if cur_record[0] not in visited_states:
-            visited_states.add(cur_record[0]) 
+        # expand current node if not visited (x,y) or found a cheaper path
+        # accepting a cheaper path is necessary for astar with non-consistent heuristics
+        if cur_record[0] not in visited or cur_record[2] < visited[cur_record[0]]:
+            visited[cur_record[0]] = cur_record[2]
             for cand_state, action, cost in problem.getSuccessors(cur_record[0]):
                 agg_cost = cur_record[2] + cost
                 cand_record = (cand_state, action, agg_cost, cur_record)
