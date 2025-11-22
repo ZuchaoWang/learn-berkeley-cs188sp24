@@ -106,11 +106,11 @@ The `GameStateData` class is defined in `game.py` file. It contains the followin
 
 #### `SearchAgent` class
 
-This is the pacman agent in question 1 defined in `search.py`. Its `registerInitialState` method determines all actions before any action is taken. It uses the search algorithms implemented in `search.py` file to find a path to the goal, and store the actions in `self.actions` list. Then its `getAction` method simply returns the next action from `self.actions` list. The current action is tracked by `self.actionIndex` attribute.
+This is the Pacman agent in question 1 defined in `search.py`. Its `registerInitialState` method determines all actions before any action is taken. It uses the search algorithms implemented in `search.py` file to find a path to the goal, and store the actions in `self.actions` list. Then its `getAction` method simply returns the next action from `self.actions` list. The current action is tracked by `self.actionIndex` attribute.
 
 #### `SearchProblem` class
 
-This is defined in `search.py`, which the input to the search algorithms used by `SearchAgent`. It abstracts the search problem by defining the starting state, goal state, successor function, and cost function. It assumes there is only one pacman, with no ghost and pallet, and the goal is to eat all the food in the maze.
+This is defined in `search.py`, which the input to the search algorithms used by `SearchAgent`. It abstracts the search problem by defining the starting state, goal state, successor function, and cost function. It assumes there is only one Pacman, with no ghost and pallet, and the goal is to eat all the food in the maze.
 
 It has several derived classes for different search problems, such as `PositionSearchProblem`, `CornersProblem`, and `FoodSearchProblem`:
 
@@ -129,3 +129,11 @@ The different search algorithms are only different in the type of `fringe` they 
 #### Heuristics
 
 The A-star search algorithm uses heuristics to estimate the cost from the current state to the goal state. The heuristics are implemented as functions in `searchAgents.py` file. All heuristics take the current state and the `SearchProblem` instance as input, and return a non-negative integer as the estimated cost. All heuristics should be admissible (never overestimate the true cost) and consistent (satisfy the triangle inequality).
+
+We generate all the heuristics by relaxing the original problem to a simpler problem, and solving the simpler problem optimally. For Q4 and Q6 we just remove the walls. In Q4, there is only one food to reach, so we can use the Manhattan distance as the heuristic. In Q6, there are four foods to reach, so we convert it to a Traveling Salesman Problem (TSP) with only four nodes, and find the optimal TSP path cost by simply trying all permutations in `_computeTSPPathCost`.
+
+In Q7, there can be multiple foods to reach, and solveing the NP-hard TSP optimally is not feasible. So we further relax the problem by assuming Pacman can teleport between any two food positions with zero cost, with one constraint that the Pacman cannot directly teleport to a food that is going to be eaten next. The optimal solution to this relaxed problem is to first go to one food, then for all remaining foods first teleport to their closest neighbour food position. This can be solved efficiently, because the later nearest neighbour distances are order independent, so we can compute without permutation. This is implemented in `_computeTSPTeleportPathCost` function.
+
+#### Local search
+
+Q8 requires implementing a local search algorithm to find a path to the nearest food. This is implemented in `findPathToClosestDot` function in `searchAgents.py` file. It iteratively move the Pacman to the closest food position until all food are eaten. Each search for the closest food is done using BFS on the `AnyFoodSearchProblem`, which defines the goal state as reaching any food position. BFS with uniform cost is guaranteed to find the optimal path to the closest food.
