@@ -139,3 +139,7 @@ In Q7, there can be multiple foods to reach, and solveing the NP-hard TSP optima
 Q8 requires implementing a local search algorithm to find a path to the nearest food. This is implemented in `findPathToClosestDot` function in `searchAgents.py` file. It iteratively move the Pacman to the closest food position until all food are eaten. Each search for the closest food is done using BFS on the `AnyFoodSearchProblem`, which defines the goal state as reaching any food position. BFS with uniform cost is guaranteed to find the optimal path to the closest food.
 
 ### Proj2: multiagent
+
+#### `ReflexAgent` class
+
+Defined in `multiAgents.py` file, the initial version is a simple reflex agent that looks one step ahead and choose the successor state with the highest score. Basically it just tries to eat scared ghosts and food, while avoiding non-scared ghosts in the next step. It does not plan ahead and perform any complex evaluation.

@@ -18,6 +18,7 @@ import random, util
 
 from game import Agent
 from pacman import GameState
+from evaluator import computeMinDistanceToFoodAndCapsule, computeMinDistanceToGhost
 
 class ReflexAgent(Agent):
     """
@@ -69,13 +70,29 @@ class ReflexAgent(Agent):
         """
         # Useful information you can extract from a GameState (pacman.py)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
-        newPos = successorGameState.getPacmanPosition()
-        newFood = successorGameState.getFood()
-        newGhostStates = successorGameState.getGhostStates()
-        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+        # newPos = successorGameState.getPacmanPosition()
+        # newFood = successorGameState.getFood()
+        # newGhostStates = successorGameState.getGhostStates()
+        # newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+        # return successorGameState.getScore()
 
-        "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        totalScore = 0
+        # add score already present in the successor state
+        totalScore += successorGameState.getScore()
+        # encourage eating capsules
+        if action != Directions.STOP:
+            if successorGameState.getPacmanPosition() in currentGameState.getCapsules():
+                totalScore += 20
+        # encourage moving towards food
+        if successorGameState.getNumFood():
+            minFoodDist = computeMinDistanceToFoodAndCapsule(successorGameState)
+            totalScore += 10 / 2 / (minFoodDist + 1)
+        # discourage getting too close to ghosts
+        if successorGameState.getGhostPositions():
+            if computeMinDistanceToGhost(successorGameState) == 1:
+                totalScore -= 500 / 2
+        return totalScore
+
 
 def scoreEvaluationFunction(currentGameState: GameState):
     """
