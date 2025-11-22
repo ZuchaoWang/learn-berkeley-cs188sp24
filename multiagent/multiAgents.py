@@ -18,7 +18,7 @@ import random, util
 
 from game import Agent
 from pacman import GameState
-from evaluator import computeMinDistanceToFoodAndCapsule, computeMinDistanceToGhost
+from evaluator import computeMinDistanceToFoodAndCapsule, computeMinDistanceToUnscaredGhost
 
 class ReflexAgent(Agent):
     """
@@ -89,7 +89,7 @@ class ReflexAgent(Agent):
             totalScore += 10 / 2 / (minFoodDist + 1)
         # discourage getting too close to ghosts
         if successorGameState.getGhostPositions():
-            if computeMinDistanceToGhost(successorGameState) == 1:
+            if computeMinDistanceToUnscaredGhost(successorGameState) == 1:
                 totalScore -= 500 / 2
         return totalScore
 

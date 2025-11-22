@@ -68,6 +68,8 @@ The entrypoint of the game is in `pacman.py` file, specifically the `runGames` f
 
 The `Game` class is defined in `game.py` file. Its `run` method first call `agent.registerInitialState` method for all agents to let them initialize their internal states. Then it enters the main game loop, where it first calls `observationFunction` to get the current game state, then calls each agent's `agent.getAction` method to get their actions, then applies the actions to the game state using `state.generateSuccessor` method. This loop continues until the game is over (win or lose).
 
+In `state.generateSuccessor`, the pacman moves first and eat food or capsules if any. Then each ghost moves in turn. After all agents have moved, the ghosts' scared timers are decremented by 1 if they are greater than 0. After that the game checks if there's collision between pacman and any ghost, and apply the corresponding rules (pacman eats ghost or pacman is eaten). Finally, the game checks if all food are eaten (win condition). Note if the ghost's scared timer is 1, at collision checking time it is already decremented to 0, so the ghost is no longer scared.
+
 #### Game state
 
 The game state is represented by the `GameState` class defined in `pacman.py` file. This class contains all the information about the current state of the game, including the following:

@@ -66,35 +66,42 @@ class AnyPosSearchProblem(search.SearchProblem):
 
 def computeMinDistanceToFoodAndCapsule(gameState) -> int:
     """
-    Computes the minimum distance from startPos to any food in the gameState.
-    Returns 0 if there is no food.
+    Computes the minimum distance from startPos to any food or capsule in the gameState.
+    Returns 0 if there is no food or capsule.
     """
-    startPos = gameState.getPacmanPosition()
     foodAndCapsule = gameState.getFood().copy()
     for capsule in gameState.getCapsules():
         foodAndCapsule[int(capsule[0])][int(capsule[1])] = True
-    walls = gameState.getWalls()
 
+    if foodAndCapsule.count() == 0:
+        return 0
+    
+    startPos = gameState.getPacmanPosition()
+    walls = gameState.getWalls()
     problem = AnyPosSearchProblem(startPos, foodAndCapsule, walls)
     path = search.bfs(problem)
 
     return problem.getCostOfActions(path)
 
 
-def computeMinDistanceToGhost(gameState) -> int:
+def computeMinDistanceToUnscaredGhost(gameState) -> int:
     """
     Computes the minimum distance from startPos to any ghost in the gameState.
-    Returns 0 if there is no ghost.
+    Returns 999999 if there is no ghost.
     """
-    startPos = gameState.getPacmanPosition()
     ghostStates = gameState.getGhostStates()
     walls = gameState.getWalls()
-
     ghostPositionsGrid = Grid(walls.width, walls.height, False)
     for ghostState in ghostStates:
         pos = ghostState.getPosition()
-        ghostPositionsGrid[int(pos[0])][int(pos[1])] = True
+        scaredTimer = ghostState.scaredTimer
+        if scaredTimer <= 2: # either unscared or about to be unscared
+            ghostPositionsGrid[int(pos[0])][int(pos[1])] = True
 
+    if ghostPositionsGrid.count() == 0:
+        return 999999
+
+    startPos = gameState.getPacmanPosition()
     problem = AnyPosSearchProblem(startPos, ghostPositionsGrid, walls)
     path = search.bfs(problem)
 
