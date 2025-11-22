@@ -108,6 +108,24 @@ The `GameStateData` class is defined in `game.py` file. It contains the followin
 
 This is the pacman agent in question 1 defined in `search.py`. Its `registerInitialState` method determines all actions before any action is taken. It uses the search algorithms implemented in `search.py` file to find a path to the goal, and store the actions in `self.actions` list. Then its `getAction` method simply returns the next action from `self.actions` list. The current action is tracked by `self.actionIndex` attribute.
 
-#### `PositionSearchProblem` class
+#### `SearchProblem` class
 
-This is the input to the search algorithms used by `SearchAgent`. It assumes there is only one agent (one pacman, no ghost), and one single food to reach.
+This is defined in `search.py`, which the input to the search algorithms used by `SearchAgent`. It abstracts the search problem by defining the starting state, goal state, successor function, and cost function. It assumes there is only one pacman, with no ghost and pallet, and the goal is to eat all the food in the maze.
+
+It has several derived classes for different search problems, such as `PositionSearchProblem`, `CornersProblem`, and `FoodSearchProblem`:
+
+- `PositionSearchProblem`: The goal is to reach a specific position in the maze, so there is only a single food to reach.
+- `CornersProblem`: The goal is to reach all four corners of the maze, so there are four foods to reach.
+- `FoodSearchProblem`: The goal is to eat all the food in the maze, so there can be multiple foods to reach.
+
+#### Search algorithms
+
+The search algorithms are implemented as functions in `search.py` file. They take a `SearchProblem` instance as input, and return a list of actions to reach the goal state from the start state.
+
+In my implementation, all search algorithms are based on `_generalSearch` function, which takes a `fringe` data structure as input to determine the search strategy. It allows the same state to be added multiple times to the fringe, but only the first one will be expanded. It assumes that the goal state is always reachable from the start state.
+
+The different search algorithms are only different in the type of `fringe` they use: `Stack` for DFS, `Queue` for BFS, `PriorityQueueWithFunction` for UCS and A-star.
+
+#### Heuristics
+
+The A-star search algorithm uses heuristics to estimate the cost from the current state to the goal state. The heuristics are implemented as functions in `searchAgents.py` file. All heuristics take the current state and the `SearchProblem` instance as input, and return a non-negative integer as the estimated cost. All heuristics should be admissible (never overestimate the true cost) and consistent (satisfy the triangle inequality).

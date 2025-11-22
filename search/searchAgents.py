@@ -43,6 +43,8 @@ import time
 import search
 import pacman
 
+from itertools import permutations
+
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
 
@@ -377,21 +379,26 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     if not remainingCorners:
         return 0
 
-    # generate all permutations of remaining corners
-    # find the minimum path cost among all permutations
-    from itertools import permutations
+    # relax the problem to a TSP by removing walls
+    return _computeTSPPathCost(currentPosition, remainingCorners)
+
+
+def _computeTSPPathCost(startPos, foodPoses) -> int:
+    """
+    generate all permutations of remaining corners
+    find the minimum path cost among all permutations
+    """
     minPathCost = 999999
-    for perm in permutations(remainingCorners):
+    for perm in permutations(foodPoses):
         # compute path cost for this permutation
         pathCost = 0
-        currentPos = currentPosition
+        currentPos = startPos
         for corner in perm:
             # compute manhattan distance
             pathCost += abs(currentPos[0] - corner[0]) + abs(currentPos[1] - corner[1])
             currentPos = corner
         minPathCost = min(minPathCost, pathCost)
     return minPathCost
-
 
 
 class AStarCornersAgent(SearchAgent):
@@ -480,8 +487,40 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+    return _computeTSPTeleportPathCost(position, foodGrid.asList())
+
+
+def _computeTSPTeleportPathCost(startPos, foodPoses) -> int:
+    """
+    Compute the nearest neighbour distance for all food positions.
+    Then compute the minimum replacement distance: distance from any food to startPos minus nearest neighbour distance.
+    Return the sum of nearest neighbour distance and minimum replacement distance.
+    """
+    if not foodPoses:
+        return 0
+    
+    if len(foodPoses) == 1:
+        return abs(startPos[0] - foodPoses[0][0]) + abs(startPos[1] - foodPoses[0][1])
+
+    # compute nearest neighbour distance
+    nnDistances = []
+    for i in range(len(foodPoses)):
+        minDist = 999999
+        for j in range(len(foodPoses)):
+            if i != j:
+                dist = abs(foodPoses[i][0] - foodPoses[j][0]) + abs(foodPoses[i][1] - foodPoses[j][1])
+                minDist = min(minDist, dist)
+        nnDistances.append(minDist)
+
+    # compute minimum replacement distance
+    minReplacementDistance = 999999
+    for i in range(len(foodPoses)):
+        distToStart = abs(startPos[0] - foodPoses[i][0]) + abs(startPos[1] - foodPoses[i][1])
+        replacementDistance = distToStart - nnDistances[i]
+        minReplacementDistance = min(minReplacementDistance, replacementDistance)
+
+    # return total estimated cost
+    return sum(nnDistances) + minReplacementDistance
 
 
 class ClosestDotSearchAgent(SearchAgent):
