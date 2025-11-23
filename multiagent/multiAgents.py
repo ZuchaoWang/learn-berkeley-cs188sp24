@@ -84,13 +84,11 @@ class ReflexAgent(Agent):
             if successorGameState.getPacmanPosition() in currentGameState.getCapsules():
                 totalScore += 20
         # encourage moving towards food
-        if successorGameState.getNumFood():
-            minFoodDist = computeMinDistanceToFoodAndCapsule(successorGameState)
-            totalScore += 10 / 2 / (minFoodDist + 1)
+        minFoodDist = computeMinDistanceToFoodAndCapsule(successorGameState)
+        totalScore += 10 / 2 / (minFoodDist + 1)
         # discourage getting too close to ghosts
-        if successorGameState.getGhostPositions():
-            if computeMinDistanceToUnscaredGhost(successorGameState) == 1:
-                totalScore -= 500 / 2
+        if computeMinDistanceToUnscaredGhost(successorGameState) == 1:
+            totalScore -= 500 / 2
         return totalScore
 
 
