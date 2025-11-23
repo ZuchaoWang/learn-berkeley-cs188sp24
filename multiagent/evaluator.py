@@ -95,7 +95,7 @@ def computeMinDistanceToUnscaredGhost(gameState) -> int:
     for ghostState in ghostStates:
         pos = ghostState.getPosition()
         scaredTimer = ghostState.scaredTimer
-        if scaredTimer <= 2: # either unscared or about to be unscared
+        if scaredTimer <= 1: # either unscared or about to be unscared
             ghostPositionsGrid[int(pos[0])][int(pos[1])] = True
 
     if ghostPositionsGrid.count() == 0:
