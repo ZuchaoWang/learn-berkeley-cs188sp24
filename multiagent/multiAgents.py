@@ -20,6 +20,8 @@ from game import Agent
 from pacman import GameState
 from evaluator import computeMinDistanceToFoodAndCapsule, computeMinDistanceToUnscaredGhost
 
+from typing import Tuple
+
 class ReflexAgent(Agent):
     """
     A reflex agent chooses an action at each choice point by examining
@@ -150,8 +152,36 @@ class MinimaxAgent(MultiAgentSearchAgent):
         gameState.isLose():
         Returns whether or not the game state is a losing state
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        _, action = self._getMinMaxInfo(gameState, self.depth, self.index)
+        return action
+
+    def _getMinMaxInfo(self, gameState: GameState, more_levels: int, agentIndex: int) -> Tuple[float, str]:
+        """
+        Helper function to get the minimax info for a given game state
+        Return a tuple of (score, action)
+        1. If the game state is a terminal state (win/lose), return the score
+        2. If more_levels == 0, return the evaluation function value
+        3. Otherwise, for each legal action, get the successor state and
+           recursively call _getMinMaxValue on the successor state with
+            updated more_levels and agentIndex; if agentIndex == 0, it's a max node,
+            otherwise it's a min node.
+        """
+        if gameState.isWin() or gameState.isLose():
+            return gameState.getScore(), Directions.STOP
+        if more_levels == 0:
+            return self.evaluationFunction(gameState), Directions.STOP
+        
+        legal_actions = gameState.getLegalActions(agentIndex)
+        successors = []
+        for action in legal_actions:
+            successor_state = gameState.generateSuccessor(agentIndex, action)
+            next_agent_index = (agentIndex + 1) % gameState.getNumAgents()
+            next_more_levels = more_levels - 1 if next_agent_index == 0 else more_levels
+            succ_score, _ = self._getMinMaxInfo(successor_state, next_more_levels, next_agent_index)
+            successors.append((succ_score, action))
+        agg_func = max if agentIndex == 0 else min
+        return agg_func(successors, key=lambda x: x[0])
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
