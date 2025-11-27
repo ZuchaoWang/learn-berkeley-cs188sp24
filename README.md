@@ -151,3 +151,5 @@ The improved version of `ReflexAgent` uses a better evaluation function `betterE
 #### Adversarial search algorithms
 
 Implemented Minimax, Alpha-Beta pruning, and Expectimax algorithms in `multiAgents.py` file, based on textbook pseudocode. That solves Q2, Q3, and Q4.
+
+### Proj3: logic
