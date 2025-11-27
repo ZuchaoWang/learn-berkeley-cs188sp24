@@ -145,3 +145,9 @@ Q8 requires implementing a local search algorithm to find a path to the nearest 
 #### `ReflexAgent` class
 
 Defined in `multiAgents.py` file, the initial version is a simple reflex agent that looks one step ahead and choose the successor state with the highest score. Basically it just tries to eat scared ghosts and food, while avoiding non-scared ghosts in the next step. It does not plan ahead and perform any complex evaluation.
+
+The improved version of `ReflexAgent` uses a better evaluation function `betterEvaluationFunction`. It not only count succesor score, but add bonus based on its state. The bonus encourages eating capsules and moving towards the closest food or capsule, while discouraging getting too close to unscared ghosts. This evaluation function is based on the distance calculation code implemented in `evaluator.py` file, which is in turn based on BFS search in `search.py` file. The `search.py` file is directly copied from Proj1 without any modification. This evaluation function is used both in Q1 and Q5.
+
+#### Adversarial search algorithms
+
+Implemented Minimax, Alpha-Beta pruning, and Expectimax algorithms in `multiAgents.py` file, based on textbook pseudocode. That solves Q2, Q3, and Q4.
