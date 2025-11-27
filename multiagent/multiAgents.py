@@ -21,7 +21,7 @@ from pacman import GameState
 from evaluator import computeMinDistanceToFoodAndCapsule, computeMinDistanceToUnscaredGhost
 
 from typing import Tuple
-import sys
+
 
 class ReflexAgent(Agent):
     """
@@ -196,12 +196,12 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         Returns the minimax action using self.depth and self.evaluationFunction
         """
-        alpha = -sys.maxsize
-        beta = sys.maxsize
+        alpha = float("-inf")
+        beta = float("inf")
         _, action = self._getMinMaxInfo(gameState, alpha, beta, self.depth, self.index)
         return action
 
-    def _getMinMaxInfo(self, gameState: GameState, alpha: int, beta: int, more_levels: int, agentIndex: int) -> Tuple[float, str]:
+    def _getMinMaxInfo(self, gameState: GameState, alpha: float, beta: float, more_levels: int, agentIndex: int) -> Tuple[float, str]:
         """
         Helper function to get the minimax info for a given game state
         Return a tuple of (score, action)
@@ -218,9 +218,9 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             return self.evaluationFunction(gameState), Directions.STOP
         
         if agentIndex == 0:
-            v = -sys.maxsize
+            v = float("-inf")
         else:
-            v = sys.maxsize
+            v = float("inf")
         best_action = Directions.STOP
 
         legal_actions = gameState.getLegalActions(agentIndex)
