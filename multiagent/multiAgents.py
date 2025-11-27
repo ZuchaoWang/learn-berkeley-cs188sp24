@@ -153,17 +153,17 @@ class MinimaxAgent(MultiAgentSearchAgent):
         gameState.isLose():
         Returns whether or not the game state is a losing state
         """
-        _, action = self._getMinMaxInfo(gameState, self.depth, self.index)
+        _, action = self._getMinimaxInfo(gameState, self.depth, self.index)
         return action
 
-    def _getMinMaxInfo(self, gameState: GameState, more_levels: int, agentIndex: int) -> Tuple[float, str]:
+    def _getMinimaxInfo(self, gameState: GameState, more_levels: int, agentIndex: int) -> Tuple[float, str]:
         """
         Helper function to get the minimax info for a given game state
         Return a tuple of (score, action)
         1. If the game state is a terminal state (win/lose), return the score
         2. If more_levels == 0, return the evaluation function value
         3. Otherwise, for each legal action, get the successor state and
-           recursively call _getMinMaxValue on the successor state with
+           recursively call _getMinimaxValue on the successor state with
             updated more_levels and agentIndex; if agentIndex == 0, it's a max node,
             otherwise it's a min node.
         """
@@ -178,7 +178,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
             successor_state = gameState.generateSuccessor(agentIndex, action)
             next_agent_index = (agentIndex + 1) % gameState.getNumAgents()
             next_more_levels = more_levels - 1 if next_agent_index == 0 else more_levels
-            succ_score, _ = self._getMinMaxInfo(successor_state, next_more_levels, next_agent_index)
+            succ_score, _ = self._getMinimaxInfo(successor_state, next_more_levels, next_agent_index)
             successors.append((succ_score, action))
 
         if agentIndex == 0:
@@ -198,17 +198,18 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         alpha = float("-inf")
         beta = float("inf")
-        _, action = self._getMinMaxInfo(gameState, alpha, beta, self.depth, self.index)
+        _, action = self._getMinimaxInfo(gameState, alpha, beta, self.depth, self.index)
         return action
 
-    def _getMinMaxInfo(self, gameState: GameState, alpha: float, beta: float, more_levels: int, agentIndex: int) -> Tuple[float, str]:
+    def _getMinimaxInfo(self, gameState: GameState, alpha: float, beta: float, more_levels: int, agentIndex: int) -> Tuple[float, str]:
         """
         Helper function to get the minimax info for a given game state
+        It is accelerated with alpha-beta pruning.
         Return a tuple of (score, action)
         1. If the game state is a terminal state (win/lose), return the score
         2. If more_levels == 0, return the evaluation function value
         3. Otherwise, for each legal action, get the successor state and
-           recursively call _getMinMaxValue on the successor state with
+           recursively call _getMinimaxValue on the successor state with
            updated more_levels and agentIndex; if agentIndex == 0, it's a max node,
            otherwise it's a min node.
         """
@@ -228,7 +229,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             successor_state = gameState.generateSuccessor(agentIndex, action)
             next_agent_index = (agentIndex + 1) % gameState.getNumAgents()
             next_more_levels = more_levels - 1 if next_agent_index == 0 else more_levels
-            succ_score, _ = self._getMinMaxInfo(successor_state, alpha, beta, next_more_levels, next_agent_index)
+            succ_score, _ = self._getMinimaxInfo(successor_state, alpha, beta, next_more_levels, next_agent_index)
         
             if agentIndex == 0:
                 v = max(v, succ_score)
@@ -261,8 +262,38 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         All ghosts should be modeled as choosing uniformly at random from their
         legal moves.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        _, action = self._getExpectimaxInfo(gameState, self.depth, self.index)
+        return action
+
+    def _getExpectimaxInfo(self, gameState: GameState, more_levels: int, agentIndex: int) -> Tuple[float, str]:
+        """
+        Helper function to get the expectimax info for a given game state
+        Return a tuple of (score, action)
+        1. If the game state is a terminal state (win/lose), return the score
+        2. If more_levels == 0, return the evaluation function value
+        3. Otherwise, for each legal action, get the successor state and
+           recursively call _getExpectimaxInfo on the successor state with
+            updated more_levels and agentIndex; if agentIndex == 0, it's a max node,
+            otherwise it's a expect node.
+        """
+        if gameState.isWin() or gameState.isLose():
+            return gameState.getScore(), Directions.STOP
+        if more_levels == 0:
+            return self.evaluationFunction(gameState), Directions.STOP
+        
+        legal_actions = gameState.getLegalActions(agentIndex)
+        successors = []
+        for action in legal_actions:
+            successor_state = gameState.generateSuccessor(agentIndex, action)
+            next_agent_index = (agentIndex + 1) % gameState.getNumAgents()
+            next_more_levels = more_levels - 1 if next_agent_index == 0 else more_levels
+            succ_score, _ = self._getExpectimaxInfo(successor_state, next_more_levels, next_agent_index)
+            successors.append((succ_score, action))
+
+        if agentIndex == 0:
+            return max(successors, key=lambda x: x[0])
+        else: # return STOP for action since it's not used
+            return sum([s[0] for s in successors])/len(successors), Directions.STOP
 
 def betterEvaluationFunction(currentGameState: GameState):
     """
