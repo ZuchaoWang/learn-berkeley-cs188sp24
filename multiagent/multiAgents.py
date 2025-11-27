@@ -21,6 +21,7 @@ from pacman import GameState
 from evaluator import computeMinDistanceToFoodAndCapsule, computeMinDistanceToUnscaredGhost
 
 from typing import Tuple
+import sys
 
 class ReflexAgent(Agent):
     """
@@ -195,8 +196,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         Returns the minimax action using self.depth and self.evaluationFunction
         """
-        alpha = -999999
-        beta = 999999
+        alpha = -sys.maxsize
+        beta = sys.maxsize
         _, action = self._getMinMaxInfo(gameState, alpha, beta, self.depth, self.index)
         return action
 
@@ -217,9 +218,9 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             return self.evaluationFunction(gameState), Directions.STOP
         
         if agentIndex == 0:
-            v = -999999
+            v = -sys.maxsize
         else:
-            v = 999999
+            v = sys.maxsize
         best_action = Directions.STOP
 
         legal_actions = gameState.getLegalActions(agentIndex)
