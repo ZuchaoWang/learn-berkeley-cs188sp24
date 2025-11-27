@@ -79,20 +79,7 @@ class ReflexAgent(Agent):
         # newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
         # return successorGameState.getScore()
 
-        totalScore = 0
-        # add score already present in the successor state
-        totalScore += successorGameState.getScore()
-        # encourage eating capsules
-        if action != Directions.STOP:
-            if successorGameState.getPacmanPosition() in currentGameState.getCapsules():
-                totalScore += 20
-        # encourage moving towards food
-        minFoodDist = computeMinDistanceToFoodAndCapsule(successorGameState)
-        totalScore += 10 / 2 / (minFoodDist + 1)
-        # discourage getting too close to ghosts
-        if computeMinDistanceToUnscaredGhost(successorGameState) == 1:
-            totalScore -= 500 / 2
-        return totalScore
+        return betterEvaluationFunction(successorGameState)
 
 
 def scoreEvaluationFunction(currentGameState: GameState):
@@ -302,8 +289,18 @@ def betterEvaluationFunction(currentGameState: GameState):
 
     DESCRIPTION: <write something here so we know what you did>
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    totalScore = 0
+    # add score already present in the successor state
+    totalScore += currentGameState.getScore()
+    # encourage eating capsules, the less remaining the better
+    totalScore -= len(currentGameState.getCapsules()) * 20
+    # encourage moving towards the closet food or capsule
+    minFoodDist = computeMinDistanceToFoodAndCapsule(currentGameState)
+    totalScore += 10 / 2 / (minFoodDist + 1)
+    # discourage getting too close to unscared ghosts
+    if computeMinDistanceToUnscaredGhost(currentGameState) == 1:
+        totalScore -= 500 / 2
+    return totalScore
 
 # Abbreviation
 better = betterEvaluationFunction
