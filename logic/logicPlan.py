@@ -49,9 +49,11 @@ def sentence1() -> Expr:
     (not A) if and only if ((not B) or C)
     (not A) or (not B) or C
     """
-    "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    return conjoin([
+        Expr("A") | Expr("B"),
+        ~Expr('A') % (~Expr('B') | Expr('C')),
+        disjoin([~Expr('A'), ~Expr('B'), Expr('C')])
+    ])
 
 
 def sentence2() -> Expr:
@@ -62,9 +64,12 @@ def sentence2() -> Expr:
     (not (B and (not C))) implies A
     (not D) implies C
     """
-    "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    return conjoin([
+        Expr('C') % (Expr('B') | Expr('D')),
+        Expr('A') >> (~Expr('B') & ~Expr('D')),
+        ~(Expr('B') & ~Expr('C')) >> Expr('A'),
+        ~Expr('D') >> Expr('C')
+    ])
 
 
 def sentence3() -> Expr:
@@ -79,9 +84,11 @@ def sentence3() -> Expr:
 
     Pacman is born at time 0.
     """
-    "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    return conjoin([
+        PropSymbolExpr('PacmanAlive', time=1) % ((PropSymbolExpr('PacmanAlive', time=0) & ~PropSymbolExpr('PacmanKilled', time=0)) | (~PropSymbolExpr('PacmanAlive', time=0) & PropSymbolExpr('PacmanBorn', time=0))),
+        ~(PropSymbolExpr('PacmanAlive', time=0) & PropSymbolExpr('PacmanBorn', time=0)),
+        PropSymbolExpr('PacmanBorn', time=0)
+    ])
 
 def findModel(sentence: Expr) -> Dict[Expr, bool]:
     """Given a propositional logic sentence (i.e. a Expr instance), returns a satisfying
@@ -95,25 +102,19 @@ def findModelUnderstandingCheck() -> Dict[Expr, bool]:
     You should not use findModel or Expr in this method.
     """
     a = Expr('A')
-    "*** BEGIN YOUR CODE HERE ***"
-    print("a.__dict__ is:", a.__dict__) # might be helpful for getting ideas
-    util.raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    a.op = 'a'
+    return {a: True}
 
 def entails(premise: Expr, conclusion: Expr) -> bool:
     """Returns True if the premise entails the conclusion and False otherwise.
     """
-    "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    return findModel(premise & ~conclusion) == False
 
 def plTrueInverse(assignments: Dict[Expr, bool], inverse_statement: Expr) -> bool:
     """Returns True if the (not inverse_statement) is True given assignments and False otherwise.
     pl_true may be useful here; see logic.py for its description.
     """
-    "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    return pl_true(~inverse_statement, assignments)
 
 #______________________________________________________________________________
 # QUESTION 2
