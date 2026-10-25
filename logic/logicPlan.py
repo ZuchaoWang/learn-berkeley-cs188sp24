@@ -327,9 +327,17 @@ def positionLogicPlan(problem) -> List:
     actions = [ 'North', 'South', 'East', 'West' ]
     KB = []
 
-    "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    KB.append(PropSymbolExpr(pacman_str, x0, y0, time=0))
+    for t in range(50):
+        print(f"Time step: {t}")
+        KB.append(exactlyOne([PropSymbolExpr(pacman_str, x, y, time=t) for x, y in non_wall_coords]))
+        if t > 0:
+            for x, y in non_wall_coords:
+                KB.append(pacmanSuccessorAxiomSingle(x, y, t, walls_grid))
+        model = findModel(conjoin(KB + [PropSymbolExpr(pacman_str, xg, yg, time=t)]))
+        if model:
+            return extractActionSequence(model, actions)
+        KB.append(exactlyOne([PropSymbolExpr(a, time=t) for a in actions]))
 
 #______________________________________________________________________________
 # QUESTION 5
